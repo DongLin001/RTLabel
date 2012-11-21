@@ -71,7 +71,6 @@ typedef enum
 @property (nonatomic, assign) RTTextLineBreakMode lineBreakMode;
 @property (nonatomic, assign) CGFloat lineSpacing;
 @property (nonatomic, assign) int currentSelectedButtonComponentIndex;
-@property (nonatomic, assign) CTFrameRef frameRef;
 @property (nonatomic, assign) CFRange visibleRange;
 
 // set text

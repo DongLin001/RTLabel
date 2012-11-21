@@ -307,7 +307,7 @@
 	
 	// Create the frame and draw it into the graphics context
 	//CTFrameRef 
-	self.frameRef = CTFramesetterCreateFrame(framesetter,CFRangeMake(0, 0), path, NULL);
+    CTFrameRef frame = CTFramesetterCreateFrame(framesetter,CFRangeMake(0, 0), path, NULL);
 	
 	CFRange range;
 	CGSize constraint = CGSizeMake(self.frame.size.width, CGFLOAT_MAX);
@@ -321,7 +321,7 @@
 		for (RTLabelComponent *linkableComponents in links)
 		{
 			float height = 0.0;
-			CFArrayRef frameLines = CTFrameGetLines(self.frameRef);
+			CFArrayRef frameLines = CTFrameGetLines(frame);
 			for (CFIndex i=0; i<CFArrayGetCount(frameLines); i++)
 			{
 				CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(frameLines, i);
@@ -331,8 +331,11 @@
 				CGFloat leading;
 				
 				CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-				
-				if ( (linkableComponents.position<lineRange.location && linkableComponents.position+linkableComponents.text.length>lineRange.location) || (linkableComponents.position>=lineRange.location && linkableComponents.position<lineRange.location+lineRange.length))
+
+                CGPoint origin;
+				CTFrameGetLineOrigins(frame, CFRangeMake(i, 1), &origin);
+                
+				if ( (linkableComponents.position<lineRange.location && linkableComponents.position+linkableComponents.text.length>(u_int16_t)(lineRange.location)) || (linkableComponents.position>=lineRange.location && linkableComponents.position<lineRange.location+lineRange.length))
 				{
 					CGFloat secondaryOffset;
 					double primaryOffset = CTLineGetOffsetForStringIndex(CFArrayGetValueAtIndex(frameLines,i), linkableComponents.position, &secondaryOffset);
@@ -352,22 +355,21 @@
                     [self addSubview:button];
 					
 				}
-				CGPoint origin;
-				CTFrameGetLineOrigins(self.frameRef, CFRangeMake(i, 1), &origin);
 				origin.y = self.frame.size.height - origin.y;
 				height = origin.y + descent + _lineSpacing;
 			}
 		}
 	}
 	
-	self.visibleRange = CTFrameGetVisibleStringRange(self.frameRef);
+	self.visibleRange = CTFrameGetVisibleStringRange(frame);
 
 	CFRelease(thisFont);
 	CFRelease(path);
 	CFRelease(styleDict1);
 	CFRelease(styleDict);
 	CFRelease(framesetter);
-	CTFrameDraw(self.frameRef, context);
+	CTFrameDraw(frame, context);
+    CFRelease(frame);
 }
 
 #pragma mark -
